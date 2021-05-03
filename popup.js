@@ -1,33 +1,3 @@
-// document.addEventListener('DOMContentLoaded', function(){
-//     const div = document.createElement("div")
-//     div.className = "orders"
-//     const sumP = document.createElement("p")
-//     sumP.innerHTML = 0
-//     div.innerHTML = sumP
-//     document.body.appendChild(div)
-//     console.log(div)
-//
-//     // chrome.storage.local.clear()
-//     chrome.storage.local.get('orders', function (value) {
-//         if(!value || Object.keys(value).length === 0) return
-//         console.log(value)
-//
-//         const data = {
-//             sum: 0
-//         }
-//
-//         Object.values(value.orders).forEach(element => {
-//
-//             //Считаем сумму всех сумм :)
-//             const sum = element.sum.split(',').join('')
-//             console.log(sum)
-//             data.sum += Number(sum)
-//         })
-//
-//         console.log(data.sum)
-//         sumP.innerText = data.sum
-//     })
-// })
 document.addEventListener('DOMContentLoaded', function () {
     chrome.storage.local.get('orders', function (value) {
         if (!value || Object.keys(value).length === 0) return;

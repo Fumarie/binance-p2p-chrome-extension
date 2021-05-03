@@ -55,7 +55,6 @@ function newIds() {
         console.log('newIds: ', ids)
         addButtons(ids)
     })
-    // addButtons(['20199773188304527360', '20191773042761793536'])
 }
 
 function addButtons(ids) {
