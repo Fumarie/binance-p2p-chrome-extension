@@ -1,6 +1,31 @@
-const div = document.querySelector('.Table__TableWarp-sc-1fy6eca-0 > table > tbody').childNodes
-
 window.setTimeout(newIds, 5000)
+
+const div = document.querySelector('.Table__TableWarp-sc-1fy6eca-0 > table > tbody').childNodes
+window.setTimeout(() => {
+    const buttonsList = document.querySelector('.Table__TableWarp-sc-1fy6eca-0').childNodes[1].childNodes
+    buttonsList.forEach(element => {
+        console.log(element)
+        element.onclick = function() {
+            clearButtons()
+            setTimeout(newIds, 2500)
+            console.log('event')
+        }
+        console.log('buttonsList', buttonsList)
+    })}, 5000)
+
+
+function clearButtons() {
+    div.forEach((tr, i) => {
+        if(i % 2 === 0) return
+        const td = tr.childNodes[5] || null
+        console.log('TDDDD', td)
+        if (td) {
+            const myButton = document.getElementById("MyButtonForSync")
+            if(myButton)
+            td.removeChild(myButton)
+        }
+    })
+}
 
 function newIds() {
     document.body.style.border = "5px solid red";
@@ -11,7 +36,7 @@ function newIds() {
         let ids = []
 
         console.log(orders.orders)
-        if(orders.orders) {
+        if (orders.orders) {
             console.log('orders', orders.orders)
 
             backendIds = Object.keys(orders.orders)
@@ -19,7 +44,7 @@ function newIds() {
         }
         console.log(backendIds)
         div.forEach((elem, i) => {
-            if(i % 2 === 0) {
+            if (i % 2 === 0) {
                 const id = elem.firstChild.firstChild.childNodes[2].innerText.toString()
                 if (!backendIds.includes(id)) {
                     console.log('WE FIND ID!!!!', id)
@@ -35,13 +60,13 @@ function newIds() {
 
 function addButtons(ids) {
     div.forEach((elem, i) => {
-        if(i % 2 === 0) {
+        if (i % 2 === 0) {
 
             ///
             const statusData = elem.nextSibling.childNodes[4]
-            if(statusData) {
+            if (statusData) {
                 const orderStatus = statusData.firstChild.firstChild.innerText
-                if(orderStatus !== 'Завершено') return
+                if (orderStatus !== 'Завершено') return
                 console.log(orderStatus)
             }
             ///
@@ -49,7 +74,7 @@ function addButtons(ids) {
             const id = elem.firstChild.firstChild.childNodes[2].innerText.toString()
             console.log('ids', ids)
             console.log(id)
-            if(!ids.includes(id)) return
+            if (!ids.includes(id)) return
 
 
             const td = elem.nextSibling.childNodes[5]
@@ -59,6 +84,7 @@ function addButtons(ids) {
             syncButton.innerText = "٩(͡๏̯͡๏)۶"
             syncButton.style.margin = "0px 0px 45px 0px"
             syncButton.onclick = onButtonClick;
+            syncButton.id = "MyButtonForSync"
 
             console.log(syncButton)
 
@@ -101,7 +127,7 @@ function onButtonClick(event) {
     try {
         chrome.storage.local.get('orders', function (value) {
             let object = {}
-            if(value) {
+            if (value) {
                 console.log('get: ', value)
                 object = {...value.orders, [data.id]: {...data}}
 
@@ -117,8 +143,7 @@ function onButtonClick(event) {
                 )
             }
         })
-    }
-    catch (e) {
+    } catch (e) {
         console.log(e)
     }
 }
