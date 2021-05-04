@@ -1,39 +1,53 @@
-window.setTimeout(newIds, 5000)
-
 const div = document.querySelector('.Table__TableWarp-sc-1fy6eca-0 > table > tbody').childNodes
-window.setTimeout(() => {
-    const buttonsList = document.querySelector('.Table__TableWarp-sc-1fy6eca-0').childNodes[1].childNodes
-    buttonsList.forEach(element => {
-        console.log(element)
-        element.onclick = function() {
-            clearButtons()
-            setTimeout(newIds, 2500)
-            console.log('event')
-        }
-        console.log('buttonsList', buttonsList)
-    })}, 5000)
 
+window.onload = function start() {
+    console.warn('WE STARTED AGAIN')
+    const tableDiv = document.querySelector(".Table__TableWarp-sc-1fy6eca-0")
+    const config = { attributes: false, childList: true, subtree: true }
+    const observer = new MutationObserver(function(mutationsList, observer) {
+        setTimeout(newIds, 1000)
+        setTimeout(() => {
+            const buttonsList = tableDiv.childNodes[1].childNodes
+            buttonsList.forEach(element => {
+                console.log(element)
+                element.onclick = function () {
+                    clearButtons()
+                    start()
+                    console.log('event')
+                }
+                console.log('buttonsList', buttonsList)
+            })
+        }, 1000)
+        observer.disconnect()
+    });
+    observer.observe(tableDiv, config);
+}
 
 function clearButtons() {
     div.forEach((tr, i) => {
-        if(i % 2 === 0) return
+        if (i % 2 === 0) return
         const td = tr.childNodes[5] || null
         console.log('TDDDD', td)
         if (td) {
             const myButton = document.getElementById("MyButtonForSync")
-            if(myButton)
-            td.removeChild(myButton)
+            if (myButton)
+                td.removeChild(myButton)
         }
     })
 }
 
 function newIds() {
-    document.body.style.border = "5px solid red";
+    const indicator = document.createElement("div")
+    indicator.style.cssText = "position:absolute; z-index: 99999; left: 0; top: 0;"
+    indicator.background = "#000"
+    indicator.innerHTML =  " 🙂"
+    document.body.appendChild(indicator)
 
     chrome.storage.local.get('orders', function (orders) {
         let backendIds = []
 
-        let ids = []
+        let newIds = []
+        let oldIds = []
 
         console.log(orders.orders)
         if (orders.orders) {
@@ -48,16 +62,18 @@ function newIds() {
                 const id = elem.firstChild.firstChild.childNodes[2].innerText.toString()
                 if (!backendIds.includes(id)) {
                     console.log('WE FIND ID!!!!', id)
-                    ids.push(id)
+                    newIds.push(id)
+                } else {
+                    oldIds.push(id)
                 }
             }
         })
-        console.log('newIds: ', ids)
-        addButtons(ids)
+        console.log('newIds: ', newIds)
+        addButtons(newIds, oldIds)
     })
 }
 
-function addButtons(ids) {
+function addButtons(ids, oldIds) {
     div.forEach((elem, i) => {
         if (i % 2 === 0) {
 
@@ -73,22 +89,42 @@ function addButtons(ids) {
             const id = elem.firstChild.firstChild.childNodes[2].innerText.toString()
             console.log('ids', ids)
             console.log(id)
-            if (!ids.includes(id)) return
-
 
             const td = elem.nextSibling.childNodes[5]
             console.log('td', td)
 
             const syncButton = document.createElement('button')
-            syncButton.innerText = "٩(͡๏̯͡๏)۶"
             syncButton.style.margin = "0px 0px 45px 0px"
-            syncButton.onclick = onButtonClick;
             syncButton.id = "MyButtonForSync"
 
-            console.log(syncButton)
+            if(ids.includes(id)) {
+                syncButton.innerText = "🔃"
+                syncButton.onclick = onButtonClick;
 
+            } else if (oldIds.includes(id)){
+                syncButton.color = "red"
+                syncButton.innerText = "✖"
+                syncButton.onclick = function (event) {
+                    console.log('ID = ', id)
+                    onRemoveOrder(event, id)
+                }
+            }
+            console.log(syncButton)
             td.appendChild(syncButton)
         }
+    })
+}
+
+const onRemoveOrder = (event, id) => {
+    chrome.storage.local.get('orders', function (value) {
+        const orders = value.orders
+        delete orders[id]
+        chrome.storage.local.set({orders: orders}, function () {
+                console.log('Saved: ', orders)
+            }
+        )
+
+        event.target.parentNode.removeChild(event.target.parentNode.firstChild)
     })
 }
 
@@ -141,6 +177,9 @@ function onButtonClick(event) {
                     }
                 )
             }
+
+            //Удаление кнопки после нажатия
+            event.target.parentNode.removeChild(event.target.parentNode.firstChild)
         })
     } catch (e) {
         console.log(e)

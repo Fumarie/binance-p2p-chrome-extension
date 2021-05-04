@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "beforeend",
             `
     <div>Общая сумма покупок USDT: 
-      ${crypto_buy.sum}
+      ${crypto_buy.sum.toFixed(2)}
       (${crypto_buy.count} deals)
     </div>
     <div>
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
     <hr />
     <div>Общая сумма продаж USDT: 
-      ${crypto_sell.sum}
+      ${crypto_sell.sum.toFixed(2)}
       (${crypto_sell.count} deals)
     </div>
     <div>
@@ -80,10 +80,10 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
     <hr />
     <div>
-    Ожидаемый профит ${expected_profit}(${expected_profit_percent}%)
+    Ожидаемый профит ${expected_profit.toFixed(2)}(${expected_profit_percent.toFixed(2)}%)
     <div>
     </div>
-    Действительный профит ${profit}
+    Действительный профит ${profit.toFixed(2)}
     </div>
     `
         );
