@@ -1,7 +1,7 @@
 const div = document.querySelector('.Table__TableWarp-sc-1fy6eca-0 > table > tbody').childNodes
 
 window.onload = function start() {
-    console.warn('WE STARTED AGAIN')
+    // console.warn('WE STARTED AGAIN')
     const tableDiv = document.querySelector(".Table__TableWarp-sc-1fy6eca-0")
     const config = { attributes: false, childList: true, subtree: true }
     const observer = new MutationObserver(function(mutationsList, observer) {
@@ -9,13 +9,13 @@ window.onload = function start() {
         setTimeout(() => {
             const buttonsList = tableDiv.childNodes[1].childNodes
             buttonsList.forEach(element => {
-                console.log(element)
+                // console.log(element)
                 element.onclick = function () {
                     clearButtons()
                     start()
-                    console.log('event')
+                    // console.log('event')
                 }
-                console.log('buttonsList', buttonsList)
+                // console.log('buttonsList', buttonsList)
             })
         }, 1000)
         observer.disconnect()
@@ -27,7 +27,7 @@ function clearButtons() {
     div.forEach((tr, i) => {
         if (i % 2 === 0) return
         const td = tr.childNodes[5] || null
-        console.log('TDDDD', td)
+        // console.log('TDDDD', td)
         if (td) {
             const myButton = document.getElementById("MyButtonForSync")
             if (myButton)
@@ -49,26 +49,26 @@ function newIds() {
         let newIds = []
         let oldIds = []
 
-        console.log(orders.orders)
+        // console.log(orders.orders)
         if (orders.orders) {
-            console.log('orders', orders.orders)
+            // console.log('orders', orders.orders)
 
             backendIds = Object.keys(orders.orders)
-            console.log(Object.keys(orders.orders))
+            // console.log(Object.keys(orders.orders))
         }
-        console.log(backendIds)
+        // console.log(backendIds)
         div.forEach((elem, i) => {
             if (i % 2 === 0) {
                 const id = elem.firstChild.firstChild.childNodes[2].innerText.toString()
                 if (!backendIds.includes(id)) {
-                    console.log('WE FIND ID!!!!', id)
+                    // console.log('WE FIND ID!!!!', id)
                     newIds.push(id)
                 } else {
                     oldIds.push(id)
                 }
             }
         })
-        console.log('newIds: ', newIds)
+        // console.log('newIds: ', newIds)
         addButtons(newIds, oldIds)
     })
 }
@@ -82,16 +82,16 @@ function addButtons(ids, oldIds) {
             if (statusData) {
                 const orderStatus = statusData.firstChild.firstChild.innerText
                 if (orderStatus !== 'Завершено') return
-                console.log(orderStatus)
+                // console.log(orderStatus)
             }
             ///
 
             const id = elem.firstChild.firstChild.childNodes[2].innerText.toString()
-            console.log('ids', ids)
-            console.log(id)
+            // console.log('ids', ids)
+            // console.log(id)
 
             const td = elem.nextSibling.childNodes[5]
-            console.log('td', td)
+            // console.log('td', td)
 
             const syncButton = document.createElement('button')
             syncButton.style.margin = "0px 0px 45px 0px"
@@ -105,26 +105,27 @@ function addButtons(ids, oldIds) {
                 syncButton.color = "red"
                 syncButton.innerText = "✖"
                 syncButton.onclick = function (event) {
-                    console.log('ID = ', id)
+                    // console.log('ID = ', id)
                     onRemoveOrder(event, id)
                 }
             }
-            console.log(syncButton)
+            // console.log(syncButton)
             td.appendChild(syncButton)
         }
     })
 }
+
 
 const onRemoveOrder = (event, id) => {
     chrome.storage.local.get('orders', function (value) {
         const orders = value.orders
         delete orders[id]
         chrome.storage.local.set({orders: orders}, function () {
-                console.log('Saved: ', orders)
+            const syncButton = event.target
+            syncButton.innerText = "🔃"
+            syncButton.onclick = onButtonClick;
             }
         )
-
-        event.target.parentNode.removeChild(event.target.parentNode.firstChild)
     })
 }
 
@@ -136,10 +137,10 @@ function onButtonClick(event) {
     const currency = row.childNodes[2].firstChild.firstChild.childNodes[1].childNodes[1].innerText
     const volume = row.childNodes[2].firstChild.childNodes[1].childNodes[1].firstChild.innerText
 
-    console.log('sum', sum)
-    console.log('rate', rate)
-    console.log(currency)
-    console.log(volume)
+    // console.log('sum', sum)
+    // console.log('rate', rate)
+    // console.log(currency)
+    // console.log(volume)
 
     const idRow = row.previousSibling.firstChild.firstChild
 
@@ -147,7 +148,7 @@ function onButtonClick(event) {
     const id = idRow.childNodes[2].innerText
     const date = idRow.childNodes[3].innerText
 
-    console.log(type, id, date)
+    // console.log(type, id, date)
 
     const data = {
         sum,
@@ -158,31 +159,38 @@ function onButtonClick(event) {
         id,
         date
     }
-    console.log('-------------------------------------------------------------------')
+    // console.log('-------------------------------------------------------------------')
     try {
         chrome.storage.local.get('orders', function (value) {
             let object = {}
             if (value) {
-                console.log('get: ', value)
+                // console.log('get: ', value)
                 object = {...value.orders, [data.id]: {...data}}
 
-                console.log('object', object)
+                // console.log('object', object)
                 chrome.storage.local.set({orders: {...object}}, function () {
-                        console.log('Saved: ', data)
+                        // console.log('Saved: ', data)
                     }
                 )
             } else {
                 chrome.storage.local.set({orders: {[data.id]: {...data}}}, function () {
-                        console.log('Saved: ', data)
+                        // console.log('Saved: ', data)
                     }
                 )
             }
 
-            //Удаление кнопки после нажатия
-            event.target.parentNode.removeChild(event.target.parentNode.firstChild)
+            //Замена кнопки на remove
+            const button = event.target
+            button.color = "red"
+            button.innerText = "✖"
+            button.onclick = function (event) {
+                // console.log('ID = ', id)
+                onRemoveOrder(event, id)
+            }
+
         })
     } catch (e) {
-        console.log(e)
+        // console.log(e)
     }
 }
 
