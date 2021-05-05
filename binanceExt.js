@@ -1,34 +1,47 @@
-const div = document.querySelector('.Table__TableWarp-sc-1fy6eca-0 > table > tbody').childNodes
 
-window.onload = function start() {
+window.onload = () => {
+    start()
+}
+
+function start(number) {
     // console.warn('WE STARTED AGAIN')
     const tableDiv = document.querySelector(".Table__TableWarp-sc-1fy6eca-0")
     const config = { attributes: false, childList: true, subtree: true }
+    const tr = tableDiv.firstChild.childNodes[2].firstChild
+    // console.log(tr)
+    // console.log('Observing=======')
     const observer = new MutationObserver(function(mutationsList, observer) {
-        setTimeout(newIds, 1000)
-        setTimeout(() => {
-            const buttonsList = tableDiv.childNodes[1].childNodes
-            buttonsList.forEach(element => {
-                // console.log(element)
-                element.onclick = function () {
-                    clearButtons()
-                    start()
-                    // console.log('event')
-                }
-                // console.log('buttonsList', buttonsList)
-            })
-        }, 1000)
+        // console.log('Mutation found====')
         observer.disconnect()
+        setTimeout(() => {
+            clearButtons()
+            newIds()
+            addButtonEvents(tableDiv, observer)
+        }, 1000)
+
     });
-    observer.observe(tableDiv, config);
+    if(number === 2)
+        observer.observe(tr, config)
+    observer.observe(tableDiv, config)
+}
+
+const addButtonEvents = (tableDiv, observer) => {
+    const buttonsList = tableDiv.childNodes[1].childNodes
+    buttonsList.forEach(element => {
+        element.onclick = function () {
+                observer.disconnect()
+                start(2)
+        }
+    })
 }
 
 function clearButtons() {
+    const div = document.querySelector('.Table__TableWarp-sc-1fy6eca-0 > table > tbody').childNodes
     div.forEach((tr, i) => {
         if (i % 2 === 0) return
         const td = tr.childNodes[5] || null
-        // console.log('TDDDD', td)
-        if (td) {
+        // console.log('TDDDD', td.childNodes)
+        if (td.childNodes.length) {
             const myButton = document.getElementById("MyButtonForSync")
             if (myButton)
                 td.removeChild(myButton)
@@ -37,6 +50,7 @@ function clearButtons() {
 }
 
 function newIds() {
+    const div = document.querySelector('.Table__TableWarp-sc-1fy6eca-0 > table > tbody').childNodes
     const indicator = document.createElement("div")
     indicator.style.cssText = "position:absolute; z-index: 99999; left: 0; top: 0;"
     indicator.background = "#000"
@@ -45,7 +59,6 @@ function newIds() {
 
     chrome.storage.local.get('orders', function (orders) {
         let backendIds = []
-
         let newIds = []
         let oldIds = []
 
@@ -74,6 +87,7 @@ function newIds() {
 }
 
 function addButtons(ids, oldIds) {
+    const div = document.querySelector('.Table__TableWarp-sc-1fy6eca-0 > table > tbody').childNodes
     div.forEach((elem, i) => {
         if (i % 2 === 0) {
 
