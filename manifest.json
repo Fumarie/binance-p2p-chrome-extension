@@ -3,7 +3,7 @@
   "name": "binanceExt2",
   "version": "1.0",
   "icons": {
-    "48": "icons/border-48.png"
+    "48": "icons/BinanceIcon.png"
   },
   "content_scripts": [
     {
